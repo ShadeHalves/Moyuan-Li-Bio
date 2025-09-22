@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Final Project Proposal · Text Story + Visuals</title>
+  <meta name="description" content="A single-file, responsive, accessible proposal page for a personal academic homepage: text narrative + visuals + light interactivity (no interactive graphs)." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%231a2332'/%3E%3Ctext x='50' y='58' text-anchor='middle' font-size='56' fill='%23fff' font-family='Arial'%3EP%3C/text%3E%3C/svg%3E" />
+  <style>
+    /* ===== Design tokens ===== */
+    :root {
+      --bg: #0b0f17;         /* page background */
+      --panel: #111827;      /* card/bg */
+      --text: #e5e7eb;       /* foreground */
+      --muted: #9aa4b2;
+      --brand: #60a5fa;      /* blue */
+      --accent: #34d399;     /* green */
+      --warn: #f59e0b;       /* amber */
+      --border: #1f2937;     /* subtle border */
+      --radius: 14px;        /* rounded corners */
+      --shadow: 0 10px 28px rgba(0,0,0,.35);
+    }
+
+    /* Base */
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;color:var(--text);background:radial-gradient(1200px 800px at 10% -10%,#132235 0%,transparent 60%),
+                                  radial-gradient(1000px 600px at 120% 0%,#153327 0%,transparent 55%),
+                                  var(--bg);
+      font:16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,PingFang SC,Noto Sans SC,sans-serif}
+    img{max-width:100%;display:block}
+    a{color:var(--brand);text-decoration:none}
+    a:hover{text-decoration:underline}
+    code,kbd{background:#0f172a;border:1px solid var(--border);padding:.1em .35em;border-radius:6px}
+
+    /* Layout */
+    .container{max-width:1100px;margin:0 auto;padding:24px}
+    header{position:sticky;top:0;z-index:50;background:rgba(17,24,39,.82);backdrop-filter:blur(6px);border-bottom:1px solid var(--border)}
+    nav{display:flex;gap:18px;align-items:center;padding:14px 24px}
+    nav .brand{font-weight:700}
+    nav .spacer{flex:1}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--border);border-radius:999px;background:#0f172a;color:var(--muted)}
+    .pill:hover{border-color:#2b3445;color:#dbe1ea}
+
+    .hero{display:grid;grid-template-columns: 1.1fr .9fr;gap:22px;margin:22px 0;padding:22px;border:1px solid var(--border);border-radius:var(--radius);background:linear-gradient(160deg,rgba(255,255,255,.04),rgba(255,255,255,.02));box-shadow:var(--shadow)}
+    .hero h1{margin:.1em 0 .3em;font-size:40px;line-height:1.15}
+    .tag{display:inline-block;padding:.35em .7em;border-radius:999px;border:1px solid var(--border);background:#0f172a;color:var(--muted);margin-right:8px}
+    .cta{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;border:1px solid var(--border);background:#0f1320;color:#e5e7eb;box-shadow:var(--shadow)}
+    .cta:hover{transform:translateY(-1px);border-color:#2f3b52}
+
+    .grid{display:grid;gap:18px;grid-template-columns:repeat(3,1fr)}
+    @media (max-width: 980px){.hero{grid-template-columns:1fr}.grid{grid-template-columns:1fr 1fr}}
+    @media (max-width: 660px){.grid{grid-template-columns:1fr}}
+
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+    .card h3{margin:.2em 0 .4em}
+    .muted{color:var(--muted)}
+    .sep{height:1px;background:var(--border);border:none;margin:28px 0}
+
+    /* Gallery + filter + lightbox */
+    .filters{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+    .filter-btn{cursor:pointer}
+    .gallery{display:grid;gap:14px;grid-template-columns:repeat(3,1fr)}
+    @media (max-width: 900px){.gallery{grid-template-columns:1fr 1fr}}
+    @media (max-width: 620px){.gallery{grid-template-columns:1fr}}
+    .thumb{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:#0b1220}
+    .thumb figcaption{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,transparent,rgba(0,0,0,.65));padding:8px 10px;font-size:14px}
+
+    .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;padding:20px}
+    .lightbox.open{display:flex}
+    .lightbox img{max-width:92vw;max-height:84vh;border-radius:12px;border:1px solid var(--border)}
+    .lightbox .close{position:absolute;top:14px;right:16px}
+    .icon-btn{cursor:pointer;border:1px solid var(--border);background:#0f172a;border-radius:10px;padding:8px 10px;color:#e5e7eb}
+
+    /* Before/After slider (non-graph interactivity) */
+    .ba{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--border);height:280px}
+    .ba img{position:absolute;inset:0;height:100%;width:100%;object-fit:cover}
+    .ba .after{clip-path: inset(0 0 0 50%)}
+    .ba .handle{position:absolute;top:0;bottom:0;left:50%;width:2px;background:rgba(255,255,255,.8)}
+    .range{width:100%}
+
+    footer{color:var(--muted);text-align:center;padding:30px 10px}
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="container" aria-label="Primary">
+      <span class="brand">Final Project Proposal</span>
+      <a class="pill" href="#about">About</a>
+      <a class="pill" href="#research">Research Focus</a>
+      <a class="pill" href="#gallery">Experiments</a>
+      <a class="pill" href="#projects">Projects</a>
+      <a class="pill" href="#contact">Contact</a>
+      <span class="spacer"></span>
+      <a class="pill" href="https://your-lab-url.example.com" target="_blank" rel="noreferrer noopener">My Lab Website →</a>
+    </nav>
+  </header>
+
+  <main class="container">
+    <!-- ===== Hero / Intro ===== -->
+    <section class="hero" id="about">
+      <div>
+        <span class="tag">Academic Homepage</span>
+        <span class="tag">Proposal Draft</span>
+        <h1>Text Story + Visuals (No Interactive Graphs Required)</h1>
+        <p class="muted">This single-file HTML page is the submission for my project proposal. It presents a concise narrative about my academic direction, selected experiment visuals, links to my lab, and representative past projects. Interactive components are lightweight (gallery filtering, image lightbox, and a before/after slider) and do not involve interactive charts.</p>
+        <p>
+          <a class="cta" href="#research">Read the Narrative ↓</a>
+        </p>
+      </div>
+      <figure class="card" aria-label="Portrait or lab photo placeholder">
+        <img src="https://picsum.photos/800/520?random=21" alt="Portrait or laboratory placeholder image" />
+        <figcaption class="muted" style="margin-top:8px">Placeholder hero visual — replace with your portrait, lab, or experiment photo.</figcaption>
+      </figure>
+    </section>
+
+    <!-- ===== Research Focus / Narrative ===== -->
+    <section class="card" id="research" aria-label="Research focus">
+      <h2>Research Focus</h2>
+      <p>
+        <strong>Direction.</strong> <em>(Replace this paragraph)</em> I investigate data-driven microfluidics and semiconductor manufacturing analytics, with emphasis on impedance cytometry, viability classification, and ML pipelines for defect mapping, lithography regression, and device clustering. My long-term goal is to bridge experimental instrumentation and interpretable machine learning for reliable, reproducible measurements at scale.
+      </p>
+      <p>
+        <strong>Approach.</strong> <em>(Replace this paragraph)</em> I combine robust hardware calibration with reproducible software toolchains. The workflow includes experiment design, signal processing, model selection, ablation, and uncertainty-aware reporting.
+      </p>
+      <div class="grid" style="margin-top:10px">
+        <article class="card">
+          <h3>Objective A</h3>
+          <p class="muted">One-sentence statement of your first objective. Replace with your own text.</p>
+        </article>
+        <article class="card">
+          <h3>Objective B</h3>
+          <p class="muted">One-sentence statement of your second objective. Replace with your own text.</p>
+        </article>
+        <article class="card">
+          <h3>Objective C</h3>
+          <p class="muted">One-sentence statement of your third objective. Replace with your own text.</p>
+        </article>
+      </div>
+    </section>
+
+    <hr class="sep" />
+
+    <!-- ===== Experiments Gallery (filter + lightbox) ===== -->
+    <section id="gallery" class="card" aria-label="Experiment visuals">
+      <h2>Experiment Visuals</h2>
+      <p class="muted">Upload your own images into an <code>assets/</code> folder and update the <code>src</code> paths. Use the filter to browse categories. Click any image to open the lightbox.</p>
+      <div class="filters" role="toolbar" aria-label="Gallery filters">
+        <button class="pill filter-btn" data-filter="all">All</button>
+        <button class="pill filter-btn" data-filter="microfluidics">Microfluidics</button>
+        <button class="pill filter-btn" data-filter="semiconductor">Semiconductor</button>
+        <button class="pill filter-btn" data-filter="ml">Machine Learning</button>
+      </div>
+      <div class="gallery" id="galleryGrid">
+        <figure class="thumb" data-cat="microfluidics">
+          <img src="https://picsum.photos/800/600?random=10" alt="Microfluidics setup placeholder" />
+          <figcaption>7‑electrode impedance cytometry — placeholder caption.</figcaption>
+        </figure>
+        <figure class="thumb" data-cat="semiconductor">
+          <img src="https://picsum.photos/800/600?random=11" alt="Wafer inspection placeholder" />
+          <figcaption>Wafer defect patterns — placeholder caption.</figcaption>
+        </figure>
+        <figure class="thumb" data-cat="ml">
+          <img src="https://picsum.photos/800/600?random=12" alt="ML pipeline placeholder" />
+          <figcaption>ML pipeline + evaluation — placeholder caption.</figcaption>
+        </figure>
+        <figure class="thumb" data-cat="microfluidics">
+          <img src="https://picsum.photos/800/600?random=13" alt="Channel fabrication placeholder" />
+          <figcaption>Channel fabrication — placeholder caption.</figcaption>
+        </figure>
+        <figure class="thumb" data-cat="semiconductor">
+          <img src="https://picsum.photos/800/600?random=14" alt="Lithography setup placeholder" />
+          <figcaption>Photoresist & lithography — placeholder caption.</figcaption>
+        </figure>
+        <figure class="thumb" data-cat="ml">
+          <img src="https://picsum.photos/800/600?random=15" alt="Clustering results placeholder" />
+          <figcaption>Clustering results — placeholder caption.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <hr class="sep" />
+
+    <!-- ===== Before/After slider (non-graph interactive) ===== -->
+    <section class="card" aria-label="Before/After visual">
+      <h2>Before / After (Example Visual)</h2>
+      <p class="muted">This non-graph interactive demonstrates a simple comparison. Replace the two images below with, e.g., raw vs. processed micrographs or device images.</p>
+      <div class="ba" id="ba">
+        <img class="before" src="https://picsum.photos/1200/800?random=31" alt="Before placeholder" />
+        <img class="after"  src="https://picsum.photos/1200/800?random=32" alt="After placeholder" />
+        <div class="handle" id="handle" aria-hidden="true"></div>
+      </div>
+      <label for="slider" class="muted" style="display:block;margin-top:10px">Reveal: <span id="pct">50</span>%</label>
+      <input class="range" type="range" id="slider" min="0" max="100" value="50" />
+    </section>
+
+    <hr class="sep" />
+
+    <!-- ===== Projects showcase ===== -->
+    <section id="projects" class="card" aria-label="Project showcase">
+      <h2>Selected Projects</h2>
+      <div class="grid" style="margin-top:10px">
+        <article class="card">
+          <h3>Project One</h3>
+          <p class="muted">One-sentence project blurb. Include scope, dataset, or result. <a href="https://github.com/your-username/your-repo" target="_blank" rel="noreferrer noopener">GitHub →</a></p>
+        </article>
+        <article class="card">
+          <h3>Project Two</h3>
+          <p class="muted">One-sentence project blurb. <a href="https://your-demo-link.example.com" target="_blank" rel="noreferrer noopener">Demo →</a></p>
+        </article>
+        <article class="card">
+          <h3>Project Three</h3>
+          <p class="muted">One-sentence project blurb. <a href="https://arxiv.org/abs/XXXX.XXXXX" target="_blank" rel="noreferrer noopener">Paper →</a></p>
+        </article>
+      </div>
+    </section>
+
+    <hr class="sep" />
+
+    <!-- ===== Contact ===== -->
+    <section id="contact" class="card" aria-label="Contact">
+      <h2>Contact</h2>
+      <p class="muted">Email: <a href="mailto:your.name@university.edu">your.name@university.edu</a> · Lab: <a href="https://your-lab-url.example.com" target="_blank" rel="noreferrer noopener">your-lab-url.example.com</a>
+      </p>
+    </section>
+
+    <footer>
+      <p>© <span id="year"></span> Your Name. Single-file proposal. Replace all placeholder texts and images before submission.</p>
+    </footer>
+  </main>
+
+  <!-- ===== Light interactivity (no charts) ===== -->
+  <div class="lightbox" id="lightbox" aria-modal="true" role="dialog" aria-label="Image viewer">
+    <button class="icon-btn close" id="closeLb" aria-label="Close">✕</button>
+    <img id="lbImg" alt="Expanded visual" />
+  </div>
+
+  <script>
+    // Footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // ===== Gallery filter =====
+    const grid = document.getElementById('galleryGrid');
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const cat = btn.dataset.filter;
+        grid.querySelectorAll('.thumb').forEach(fig => {
+          const match = cat === 'all' || fig.dataset.cat === cat;
+          fig.style.display = match ? '' : 'none';
+        });
+      });
+    });
+
+    // ===== Lightbox =====
+    const lb = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lbImg');
+    const closeLb = document.getElementById('closeLb');
+
+    grid.addEventListener('click', (e) => {
+      const img = e.target.closest('img');
+      if (!img) return;
+      lbImg.src = img.src;
+      lb.classList.add('open');
+    });
+    closeLb.addEventListener('click', () => lb.classList.remove('open'));
+    lb.addEventListener('click', (e) => { if (e.target === lb) lb.classList.remove('open'); });
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') lb.classList.remove('open'); });
+
+    // ===== Before/After slider =====
+    const slider = document.getElementById('slider');
+    const after = document.querySelector('.ba .after');
+    const handle = document.getElementById('handle');
+    const pct = document.getElementById('pct');
+    function updateBA(v){
+      const p = Number(v);
+      pct.textContent = p;
+      after.style.clipPath = `inset(0 0 0 ${p}%)`;
+      handle.style.left = p + '%';
+    }
+    slider.addEventListener('input', (e) => updateBA(e.target.value));
+    updateBA(slider.value);
+  </script>
+</body>
+</html>
